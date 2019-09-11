@@ -24,7 +24,8 @@ Widget::Widget(QWidget *parent) :
         if(info.vendorIdentifier()==vendor && info.productIdentifier()==product){
             portn=info.portName();
             ui->pushButton->setEnabled(true);
-            ui->label->setText("Conectado");
+            qDebug()<<"true";
+            ui->conect->setText("   Conectado");
             break;
         }else{
             ui->pushButton->setEnabled(false);
@@ -47,8 +48,9 @@ Widget::~Widget()
 }
 
 void Widget::Incrementar(){ //con esta funcion incrementamos el valor de una variable cada vez que el timer me dice
-    char val=0x01;
-    sl->write(val,1);
+char a[1] ={0x01};
+sl->write(a,1);
+
 }
 
 void Widget::OpenSerialPort(QString p)
@@ -92,26 +94,21 @@ void Widget::readSerial()
     QString data=QString::fromStdString(serialData.toStdString());
     qDebug()<<"data :"<<data;
     suf(data);
-    ui->datoss->appendPlainText(data);
-
 }
-void suf(QString t1){
+void Widget :: suf(QString t1){
 double t2=0;
 double t=t1.toDouble();
 QString sufig,text;
 
 
-if (t/1e6>=1)
-{    sufig="Mhz";
-    t2=(t/1e6);
-    t=t/1e6;
-    }else if (t/1e3>=1){
-    sufig="Khz";
-    t2=(t%1e3);
-    }else{
+if (t/1e3>=1)
+{    sufig="Khz";
+    t2=(t/1e3);
+    }else if (t>=1){
     sufig="hz";
-    }if (t2!=0)
-    {
-    text.append((QString)t2,sufig)
     }
+    ui->Progres->setValue((int)t2);
+    ui->label->setNum((int)t2);
+    ui->sufF1->setText(sufig);
+    ui->sufPS1->setText(sufig);
 }

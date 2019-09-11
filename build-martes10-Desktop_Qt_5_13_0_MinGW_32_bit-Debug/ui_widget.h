@@ -43,7 +43,7 @@ public:
         pushButton->setGeometry(QRect(310, 90, 75, 23));
         conect = new QLabel(Widget);
         conect->setObjectName(QString::fromUtf8("conect"));
-        conect->setGeometry(QRect(20, 70, 81, 16));
+        conect->setGeometry(QRect(30, 70, 81, 16));
         datoss = new QPlainTextEdit(Widget);
         datoss->setObjectName(QString::fromUtf8("datoss"));
         datoss->setGeometry(QRect(20, 100, 251, 91));
