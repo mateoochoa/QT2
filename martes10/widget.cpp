@@ -1,10 +1,16 @@
 #include "widget.h"
 #include "ui_widget.h"
-#include<QDebug>
+#include <QDebug>
+#include <QTimer>
+#include <QString>
+#include <stdio.h>
 
+QTimer *timer1 = new QTimer();
 Widget::Widget(QWidget *parent) :
+
     QWidget(parent),
     ui(new Ui::Widget)
+
 {
     ui->setupUi(this);
     foreach(const QSerialPortInfo &info,QSerialPortInfo::availablePorts()){
@@ -24,12 +30,25 @@ Widget::Widget(QWidget *parent) :
             ui->pushButton->setEnabled(false);
         }
     }
+    {
+        ui->setupUi(this);
+        connect(timer1,                            //conexion entre el timer y la funcion incrementar
+                SIGNAL(timeout()),
+                this,
+                SLOT(Incrementar())
+                );
+    }
     sl=new QSerialPort(this);
 }
 
 Widget::~Widget()
 {
     delete ui;
+}
+
+void Widget::Incrementar(){ //con esta funcion incrementamos el valor de una variable cada vez que el timer me dice
+    char val=0x01;
+    sl->write(val,1);
 }
 
 void Widget::OpenSerialPort(QString p)
@@ -57,10 +76,13 @@ void Widget::on_pushButton_clicked()
 {
     if(sl->isOpen()){
         sl->close();
+        if(timer1->isActive()){
+            timer1->stop();
+        }
         ui->pushButton->setText("Abrir");
     }else{
-        qDebug()<<"Ne";
         OpenSerialPort(portn);
+        timer1->start(1000);//el timer cada segundo ejecuta la funcion incrementar
     }
 }
 
@@ -68,5 +90,28 @@ void Widget::readSerial()
 {
     QByteArray serialData=sl->readAll();
     QString data=QString::fromStdString(serialData.toStdString());
+    qDebug()<<"data :"<<data;
+    suf(data);
     ui->datoss->appendPlainText(data);
+
+}
+void suf(QString t1){
+double t2=0;
+double t=t1.toDouble();
+QString sufig,text;
+
+
+if (t/1e6>=1)
+{    sufig="Mhz";
+    t2=(t/1e6);
+    t=t/1e6;
+    }else if (t/1e3>=1){
+    sufig="Khz";
+    t2=(t%1e3);
+    }else{
+    sufig="hz";
+    }if (t2!=0)
+    {
+    text.append((QString)t2,sufig)
+    }
 }
